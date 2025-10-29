@@ -43,6 +43,7 @@ async function bootstrap() {
   // CORS configuration
   const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS')?.split(',') || [
     'http://localhost:3000',
+    'https://whispa-535uvpb6k-onyedikachi-ejims-projects.vercel.app',
   ];
 
   app.enableCors({
