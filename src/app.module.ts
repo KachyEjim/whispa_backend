@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { HealthPingerService } from './modules/common/health-pinger.service';
 import { HealthController } from './modules/common/health.controller';
+import { AppController } from './app.controller';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EmailModule } from './shared/email/email.module';
@@ -22,7 +23,7 @@ import { EmailModule } from './shared/email/email.module';
     AuthModule,
     BoardsModule,
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, AppController],
   providers: [
     HealthPingerService,
     {

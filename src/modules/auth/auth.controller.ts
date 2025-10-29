@@ -116,16 +116,16 @@ export class AuthController {
   }
 
   private setAuthCookie(res: Response, token: string) {
-    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
     const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') || '1h';
 
     // Convert JWT_EXPIRES_IN to milliseconds
     const expirationMs = this.parseExpiration(expiresIn);
 
+    // Always use secure: true and sameSite: 'none' for cross-origin cookies
     res.cookie('token', token, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: expirationMs,
     });
   }
