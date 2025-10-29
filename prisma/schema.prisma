@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  username       String   @unique
+  email          String   @unique
+  passwordHash   String
+  allowAnonymous Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations (for future implementation)
+  boards Board[]
+  replies Reply[]
+
+  @@map("users")
+}
+
+model Board {
+  id           String   @id @default(uuid())
+  slug         String   @unique
+  title        String
+  content      String?  // optional long-form prompt
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublic     Boolean  @default(true)
+  allowReplies Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  replies Reply[]
+  share   Share?
+
+  @@map("boards")
+}
+
+model Reply {
+  id             String   @id @default(uuid())
+  boardId        String
+  board          Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  senderId       String?  // optional FK if signed-in user
+  sender         User?    @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  senderName     String?  // public name if signed
+  content        String
+  isAnonymous    Boolean  @default(true)
+  isPublic       Boolean  @default(false) // whether reply is public on board
+  contactClaimId String?
+  contact        Contact? @relation(fields: [contactClaimId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("replies")
+}
+
+model Contact {
+  id             String   @id @default(uuid())
+  encryptedEmail String   // encrypted, not plain-text
+  token          String   // single-use or limited use token for verification
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  // Relations
+  replies Reply[]
+
+  @@map("contacts")
+}
+
+model Share {
+  id        String   @id @default(uuid())
+  boardId   String   @unique
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  publicUrl String   // full share URL
+  ogImage   String?  // generated OG image URL
+  createdAt DateTime @default(now())
+
+  @@map("shares")
+}
